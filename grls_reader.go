@@ -95,7 +95,7 @@ func (t *GrlsReader) extractXlsData(nameFile string) {
 }
 
 func (t *GrlsReader) insertToBase(sheet *xls.WorkSheet) {
-	db, err := sql.Open("sqlite3", "file:grls.db?_journal_mode=OFF")
+	db, err := sql.Open("sqlite3", "file:grls.db?_journal_mode=OFF&_synchronous=OFF")
 	if err != nil {
 		Logging(err)
 		return
