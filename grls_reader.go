@@ -54,5 +54,28 @@ func (t *GrlsReader) extractUrl(p string) string {
 
 func (t *GrlsReader) downloadArchive(url string) {
 	dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-	filePath := fmt.Sprintf("%s/%s/%s", dir, DirTemp, "")
+	filePath := fmt.Sprintf("%s/%s/%s", dir, DirTemp, ArZir)
+	err := DownloadFile(filePath, url)
+	if err != nil {
+		Logging("file was not downloaded, exit")
+		return
+	}
+	dirZip := fmt.Sprintf("%s/%s/", dir, DirTemp)
+	err = Unzip(filePath, dirZip)
+	if err != nil {
+		Logging("file was not unzipped, exit")
+		return
+	}
+	files, err := FilePathWalkDir(dirZip)
+	if err != nil {
+		Logging("filelist return error, exit")
+		return
+	}
+	for f := range files {
+		fmt.Println(f)
+	}
+}
+
+func (t *GrlsReader) extractXlsData(url string) {
+
 }
