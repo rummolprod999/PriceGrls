@@ -32,7 +32,7 @@ func Logging(args ...interface{}) {
 }
 func CreateLogFile() {
 	dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-	dirlog := fmt.Sprintf("%s/%s", dir, DirLog)
+	dirlog := filepath.FromSlash(fmt.Sprintf("%s/%s", dir, DirLog))
 	if _, err := os.Stat(dirlog); os.IsNotExist(err) {
 		err := os.MkdirAll(dirlog, 0711)
 
@@ -43,12 +43,12 @@ func CreateLogFile() {
 	}
 	t := time.Now()
 	ft := t.Format("2006-01-02")
-	FileLog = Filelog(fmt.Sprintf("%s/log_grls_%v.log", dirlog, ft))
+	FileLog = Filelog(filepath.FromSlash(fmt.Sprintf("%s/log_grls_%v.log", dirlog, ft)))
 }
 
 func CreateTempDir() {
 	dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-	dirtemp := fmt.Sprintf("%s/%s", dir, DirTemp)
+	dirtemp := filepath.FromSlash(fmt.Sprintf("%s/%s", dir, DirTemp))
 	if _, err := os.Stat(dirtemp); os.IsNotExist(err) {
 		err := os.MkdirAll(dirtemp, 0711)
 
