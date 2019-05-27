@@ -91,6 +91,8 @@ func (t *GrlsReader) extractXlsData(nameFile string) {
 	}
 	sheet := xlFile.GetSheet(0)
 	t.insertToBase(sheet)
+	sheetExcept := xlFile.GetSheet(1)
+	t.insertToBaseExcept(sheetExcept)
 
 }
 
@@ -106,6 +108,7 @@ func (t *GrlsReader) insertToBase(sheet *xls.WorkSheet) {
 		Logging(err)
 		return
 	}
+	datePub := findFromRegExp(sheet.Row(0).Col(0), `(\d{2}\.\d{2}\.\d{4})`)
 	for r := 3; r <= int(sheet.MaxRow); r++ {
 		col := sheet.Row(r)
 		mnn := col.Col(0)
@@ -119,7 +122,42 @@ func (t *GrlsReader) insertToBase(sheet *xls.WorkSheet) {
 		ru := col.Col(8)
 		dateReg := col.Col(9)
 		code := col.Col(10)
-		_, err := db.Exec("INSERT INTO grls (id, mnn, name, form, owner, atx, quantity, max_price, first_price, ru, date_reg, code) VALUES (NULL, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)", mnn, name, form, owner, atx, quantity, maxPrice, firstPrice, ru, dateReg, code)
+		_, err := db.Exec("INSERT INTO grls (id, mnn, name, form, owner, atx, quantity, max_price, first_price, ru, date_reg, code, date_pub) VALUES (NULL, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)", mnn, name, form, owner, atx, quantity, maxPrice, firstPrice, ru, dateReg, code, datePub)
+		if err != nil {
+			Logging(err)
+		}
+	}
+}
+
+func (t *GrlsReader) insertToBaseExcept(sheet *xls.WorkSheet) {
+	db, err := sql.Open("sqlite3", "file:grls.db?_journal_mode=OFF&_synchronous=OFF")
+	if err != nil {
+		Logging(err)
+		return
+	}
+	defer db.Close()
+	_, err = db.Exec("DELETE FROM grls_except")
+	if err != nil {
+		Logging(err)
+		return
+	}
+	datePub := findFromRegExp(sheet.Row(0).Col(0), `(\d{2}\.\d{2}\.\d{4})`)
+	for r := 3; r <= int(sheet.MaxRow); r++ {
+		col := sheet.Row(r)
+		mnn := col.Col(0)
+		name := col.Col(1)
+		form := col.Col(2)
+		owner := col.Col(3)
+		atx := col.Col(4)
+		quantity := col.Col(5)
+		maxPrice := strings.ReplaceAll(col.Col(6), ",", ".")
+		firstPrice := strings.ReplaceAll(col.Col(7), ",", ".")
+		ru := col.Col(8)
+		dateReg := col.Col(9)
+		code := col.Col(10)
+		exceptCause := col.Col(11)
+		exceptDate := col.Col(12)
+		_, err := db.Exec("INSERT INTO grls_except (id, mnn, name, form, owner, atx, quantity, max_price, first_price, ru, date_reg, code, except_cause, except_date, date_pub) VALUES (NULL, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)", mnn, name, form, owner, atx, quantity, maxPrice, firstPrice, ru, dateReg, code, exceptCause, exceptDate, datePub)
 		if err != nil {
 			Logging(err)
 		}
