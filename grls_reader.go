@@ -103,7 +103,7 @@ func (t *GrlsReader) insertToBase(sheet *xls.WorkSheet) {
 		return
 	}
 	defer db.Close()
-	_, err = db.Exec("DELETE FROM grls")
+	_, err = db.Exec("DELETE FROM grls; UPDATE SQLITE_SEQUENCE SET seq = 0 WHERE name = 'grls'; VACUUM;")
 	if err != nil {
 		Logging(err)
 		return
@@ -136,7 +136,7 @@ func (t *GrlsReader) insertToBaseExcept(sheet *xls.WorkSheet) {
 		return
 	}
 	defer db.Close()
-	_, err = db.Exec("DELETE FROM grls_except")
+	_, err = db.Exec("DELETE FROM grls_except; UPDATE SQLITE_SEQUENCE SET seq = 0 WHERE name = 'grls_except'; VACUUM;")
 	if err != nil {
 		Logging(err)
 		return
