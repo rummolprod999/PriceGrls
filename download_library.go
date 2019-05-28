@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -52,7 +53,7 @@ func GetPage(url string) string {
 	return string(body)
 }
 
-func DownloadFile(filepath string, url string) error {
+func DownloadF(filepath string, url string) error {
 	resp, err := http.Get(url)
 	if err != nil {
 		return err
@@ -66,4 +67,23 @@ func DownloadFile(filepath string, url string) error {
 	defer out.Close()
 	_, err = io.Copy(out, resp.Body)
 	return err
+}
+
+func DownloadFile(filepath string, url string) error {
+	count := 0
+	for {
+		if count > 5 {
+			return errors.New(fmt.Sprintf("Не скачали файл за %d попыток %s", count, url))
+		}
+		err := DownloadF(filepath, url)
+		if err != nil {
+			count++
+			Logging(err)
+			time.Sleep(time.Second * 5)
+			CreateTempDir()
+			continue
+		}
+		return nil
+
+	}
 }
