@@ -156,7 +156,7 @@ func (t *GrlsReader) insertToBaseExcept(sheet *xls.WorkSheet) {
 		dateReg := col.Col(9)
 		code := col.Col(10)
 		exceptCause := col.Col(11)
-		exceptDate := col.Col(12)
+		exceptDate := col.Col(13)
 		_, err := db.Exec("INSERT INTO grls_except (id, mnn, name, form, owner, atx, quantity, max_price, first_price, ru, date_reg, code, except_cause, except_date, date_pub) VALUES (NULL, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)", mnn, name, form, owner, atx, quantity, maxPrice, firstPrice, ru, dateReg, code, exceptCause, exceptDate, datePub)
 		if err != nil {
 			Logging(err)
