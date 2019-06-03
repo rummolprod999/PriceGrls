@@ -144,6 +144,9 @@ func (t *GrlsReader) insertToBaseExcept(sheet *xls.WorkSheet) {
 		return
 	}
 	datePub := findFromRegExp(sheet.Row(0).Col(0), `(\d{2}\.\d{2}\.\d{4})`)
+	if datePub == "" {
+		Logging("datePub is empty")
+	}
 	for r := 3; r <= int(sheet.MaxRow); r++ {
 		col := sheet.Row(r)
 		mnn := col.Col(0)
@@ -158,7 +161,10 @@ func (t *GrlsReader) insertToBaseExcept(sheet *xls.WorkSheet) {
 		dateReg := col.Col(9)
 		code := col.Col(10)
 		exceptCause := col.Col(11)
-		exceptDate := col.Col(13)
+		exceptDate := findFromRegExp(col.Col(13), `(\d{2}\.\d{2}\.\d{4})`)
+		if exceptDate == "" {
+			Logging(fmt.Sprintf("exceptDate is empty, row %d, mnn - %s", r, mnn))
+		}
 		_, err := db.Exec("INSERT INTO grls_except (id, mnn, name, form, owner, atx, quantity, max_price, first_price, ru, date_reg, code, except_cause, except_date, date_pub) VALUES (NULL, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)", mnn, name, form, owner, atx, quantity, maxPrice, firstPrice, ru, dateReg, code, exceptCause, exceptDate, datePub)
 		t.Added++
 		if err != nil {
