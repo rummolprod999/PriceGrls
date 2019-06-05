@@ -85,7 +85,7 @@ func CreateDB() {
 		err = f.Chmod(0777)
 		if err != nil {
 			Logging(err)
-			panic(err)
+			//panic(err)
 		}
 		err = f.Close()
 		if err != nil {
